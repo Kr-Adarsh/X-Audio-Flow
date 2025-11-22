@@ -1,39 +1,43 @@
-// V6: WITH GREEN STATUS LIGHT
+// V7: THE "COOL-DOWN" FIX (NO LAG)
 // ------------------------------------------------------
 
 let forceUnmuteMode = false;
+let interactionPause = false; 
+let pauseTimer = null;
 
-// 1. THE STATE SETTER & SIGNAL SENDER
 document.addEventListener('click', (e) => {
-    setTimeout(() => {
+    // MMEDIATELY STOP THE LOOP
+    // As soon as you click, we tell the enforcer to BACK OFF.
+    interactionPause = true;
+
+    // don't wake up too early if you click fast
+    if (pauseTimer) clearTimeout(pauseTimer);
+
+    // wait 600ms after your last click to check what happened.
+    pauseTimer = setTimeout(() => {
+
+        // Find the active playing video
         const videos = Array.from(document.querySelectorAll('video'));
         const activeVideo = videos.find(v => !v.paused);
 
         if (activeVideo) {
             if (activeVideo.muted === false) {
-                // Logic: User Unmuted -> Enable Force Mode
-                if (!forceUnmuteMode) { // Only send signal if state CHANGED
-                    forceUnmuteMode = true;
-                    // Tell Background Script to turn ON the light
-                    chrome.runtime.sendMessage({ action: "TURN_ON_LIGHT" });
-                }
-            } 
-            else {
-                // Logic: User Muted -> Disable Force Mode
-                if (forceUnmuteMode) { // Only send signal if state CHANGED
-                    forceUnmuteMode = false;
-                    // Tell Background Script to turn OFF the light
-                    chrome.runtime.sendMessage({ action: "TURN_OFF_LIGHT" });
-                }
+                forceUnmuteMode = true;
+                chrome.runtime.sendMessage({ action: "TURN_ON_LIGHT" });
+            } else {
+                forceUnmuteMode = false;
+                chrome.runtime.sendMessage({ action: "TURN_OFF_LIGHT" });
             }
         }
-    }, 200);
+        interactionPause = false;
+
+    }, 600); // 0.6 seconds cool-down
 }, true);
 
 
-// 2. THE ENFORCER LOOP
 setInterval(() => {
-    if (!forceUnmuteMode) return;
+    // If user is clicking (Paused) OR doesn't want sound... DO NOTHING.
+    if (interactionPause || !forceUnmuteMode) return;
 
     const videos = document.querySelectorAll('video');
     videos.forEach(video => {
