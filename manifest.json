@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "X Audio Flow",
+    "version": "2.0",
+    "description": "Keeps X videos unmuted if you unmute one.",
+    "permissions": ["activeTab", "scripting"],
+    "action": {},
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+        "matches": ["https://twitter.com/*", "https://x.com/*"],
+        "js": ["content.js"],
+        "run_at": "document_end"
+        }
+    ]
+}
