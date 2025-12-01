@@ -1,5 +1,7 @@
 # X Audio Flow
 
+![Downloads](https://img.shields.io/github/downloads/Kr-Adarsh/X-Audio-Flow/total?style=for-the-badge&color=green) ![Visitors](https://api.visitorbadge.io/api/visitors?path=Kr-Adarsh/X-Audio-Flow&countColor=%23263759)
+
 I was getting bored scrolling through Twitter and got really annoyed that I had to click every single video just to hear the audio. The moment I scrolled to the next one, it would mute again. 
 
 So, I built this small extension to fix it.
