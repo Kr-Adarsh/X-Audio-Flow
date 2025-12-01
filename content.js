@@ -10,18 +10,28 @@ document.addEventListener('click', (e) => {
     pauseTimer = setTimeout(() => {
 
         // Find the active playing video
-        const videos = Array.from(document.querySelectorAll('video'));
-        const activeVideo = videos.find(v => !v.paused);
+        const videos = Array.from(document.querySelectorAll("video"));
+        const activeVideo = videos.find((v) => !v.paused);
 
         if (activeVideo) {
             if (activeVideo.muted === false) {
-                if (!forceUnmuteMode) console.log("🔊 X Audio Flow: ON");
-                forceUnmuteMode = true;
-                chrome.runtime.sendMessage({ action: "TURN_ON_LIGHT" });
-            } else {
-                if (forceUnmuteMode) console.log("🔇 X Audio Flow: OFF");
+                if (!forceUnmuteMode) {
+                    console.log("🔊 X Audio Flow ON");
+                    forceUnmuteMode = true;
+                    try {
+                        chrome.runtime.sendMessage({ action: "TURN_ON_LIGHT" });
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            } else if (forceUnmuteMode) {
+                console.log("🔇 X Audio Flow OFF");
                 forceUnmuteMode = false;
+                try {
                 chrome.runtime.sendMessage({ action: "TURN_OFF_LIGHT" });
+                } catch (e) {
+                console.error(e);
+                }
             }
         }
         interactionPause = false;
