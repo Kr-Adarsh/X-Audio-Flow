@@ -1,19 +1,12 @@
-// V7: THE "COOL-DOWN" FIX (NO LAG)
-// ------------------------------------------------------
-
 let forceUnmuteMode = false;
 let interactionPause = false; 
 let pauseTimer = null;
 
 document.addEventListener('click', (e) => {
-    // MMEDIATELY STOP THE LOOP
-    // As soon as you click, we tell the enforcer to BACK OFF.
     interactionPause = true;
-
-    // don't wake up too early if you click fast
     if (pauseTimer) clearTimeout(pauseTimer);
 
-    // wait 600ms after your last click to check what happened.
+    // wait 150ms after your last click to check what happened.
     pauseTimer = setTimeout(() => {
 
         // Find the active playing video
@@ -22,21 +15,22 @@ document.addEventListener('click', (e) => {
 
         if (activeVideo) {
             if (activeVideo.muted === false) {
+                if (!forceUnmuteMode) console.log("🔊 X Audio Flow: ON");
                 forceUnmuteMode = true;
                 chrome.runtime.sendMessage({ action: "TURN_ON_LIGHT" });
             } else {
+                if (forceUnmuteMode) console.log("🔇 X Audio Flow: OFF");
                 forceUnmuteMode = false;
                 chrome.runtime.sendMessage({ action: "TURN_OFF_LIGHT" });
             }
         }
         interactionPause = false;
 
-    }, 600); // 0.6 seconds cool-down
+    }, 150); // 0.15 seconds cool-down
 }, true);
 
 
 setInterval(() => {
-    // If user is clicking (Paused) OR doesn't want sound... DO NOTHING.
     if (interactionPause || !forceUnmuteMode) return;
 
     const videos = document.querySelectorAll('video');
